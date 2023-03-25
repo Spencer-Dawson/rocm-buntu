@@ -1,0 +1,22 @@
+# plugin install format is subdir -> source site -> pluginpath
+# At this time only civitai is supported
+
+embeddings:
+  #Place Textual Inversion embeddings here
+  civitai:
+    models/9857 #CharTurner
+models:
+  hypernetworks:
+    #Place hypernetworks here
+    civitai:
+      models/5255 # [Toru8P] Waven Chibi Style
+  Stable-diffusion:
+    #Put Stable Diffusion checkpoints here
+    civitai:
+      models/15236 # Deliberate
+  Lora:
+    civitai:
+      models/14856 # Moxin
+  
+#todo: support every plugin type on civitai
+#todo: support ControlNet installation
