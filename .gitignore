@@ -1,6 +1,9 @@
 #ignore installed folders
-./tg
-./sd
+tg/
+sd/
 
 #ignore user config
 ./config/*-user.yml
+
+#ignore python cache
+*__pycache__*
