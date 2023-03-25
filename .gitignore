@@ -1,0 +1,6 @@
+#ignore installed folders
+./tg
+./sd
+
+#ignore user config
+./config/*-user.yml
