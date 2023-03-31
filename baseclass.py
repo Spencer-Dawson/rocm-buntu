@@ -1,15 +1,13 @@
 # Installs Necessary Packages for using ROCm based ml tools on Ubuntu 22.04
 # Also includes abstract base class for tool wrappers
 # Author: Spencer Dawson
-# Note: Don't go deeper than 1 more level of abstraction than shown 
-#       here. If you need to go deeper, you're probably going to 
+# Note: Don't go deeper than 1 more level of abstraction than shown
+#       here. If you need to go deeper, you're probably going to
 #       introduce difficult to debug issues and confuse other devs.
 
 import os
 import sys
-import platform
 import subprocess
-import shutil
 from abc import ABC, abstractmethod
 import logging
 
@@ -19,16 +17,16 @@ logger = logging.getLogger()
 class PackageManagerBaseClass(ABC):
     """
     Package Manager class wrapper
-    This is an abstract base class that provides the structure for 
+    This is an abstract base class that provides the structure for
     a package manager to implement to behave consistently with the
-    rest of the package wrappers. It also provies some helper 
+    rest of the package wrappers. It also provies some helper
     functions
     """
 
     @abstractmethod
     def __init__(self, name):
         logger.debug("Running %s", sys._getframe())
-        
+
         # sets global constants and checks for OS compatability
         # some of these are not used in some derived classes
         # for example ROCm Instalation doesn't need a toolbase directory
@@ -36,17 +34,17 @@ class PackageManagerBaseClass(ABC):
         # name of the tool
         self.NAME = name
         # working directory
-        self.WD = os.getcwd()
+        self.WD = os.getcwd() + '/'
         # config folder
-        self.CONFIGFOLDER = self.WD + '/config'
+        self.CONFIGFOLDER = self.WD + 'config/'
         # script folder
-        self.SCRIPTFOLDER = self.WD + '/scripts'
+        self.SCRIPTFOLDER = self.WD + 'scripts/'
         # config file
         self.CONFIGFILE = self.NAME + "-user.yml"
         # default config file
         self.DEFAULTCONFIGFILE = self.NAME + "-default.yml"
         # tool base directory
-        self.TOOLBASE = self.WD + '/' + self.NAME
+        self.TOOLBASE = self.WD + self.NAME +'/'
 
         try:
             # os name pulled from system
@@ -67,13 +65,29 @@ class PackageManagerBaseClass(ABC):
         except AssertionError as e:
             logger.error("This utility only supports Ubuntu 22.04")
             sys.exit(1)
-        
+
         #check if amd card is present
         self.AMDGPU = self._check_amd_gpu()
         assert self.AMDGPU == True, "This utility only supports AMD GPUs"
         #check if rocm is installed
         self.ROCM = self._check_rocm()
         assert self.ROCM == True, "ROCm is not installed. Please install ROCm before running this utility"
+
+        #print global consts for debugging
+        logger.debug("NAME: %s", self.NAME)
+        logger.debug("WD: %s", self.WD)
+        logger.debug("CONFIGFOLDER: %s", self.CONFIGFOLDER)
+        logger.debug("SCRIPTFOLDER: %s", self.SCRIPTFOLDER)
+        logger.debug("CONFIGFILE: %s", self.CONFIGFILE)
+        logger.debug("DEFAULTCONFIGFILE: %s", self.DEFAULTCONFIGFILE)
+        logger.debug("TOOLBASE: %s", self.TOOLBASE)
+        logger.debug("OSNAME: %s", self.OSNAME)
+        logger.debug("OSRELEASE: %s", self.OSRELEASE)
+        logger.debug("OSARCH: %s", self.OSARCH)
+        logger.debug("OSVERSION: %s", self.OSVERSION)
+        logger.debug("AMDGPU: %s", self.AMDGPU)
+        logger.debug("ROCM: %s", self.ROCM)
+
 
     def _check_amd_gpu(self):
         logger.debug("Running %s", sys._getframe())
@@ -87,7 +101,7 @@ class PackageManagerBaseClass(ABC):
         except subprocess.CalledProcessError as e:
             logger.error("Error running lspci: %s", e)
             sys.exit(1)
-    
+
     def _check_rocm(self):
         logger.debug("Running %s", sys._getframe())
         try:
@@ -163,7 +177,7 @@ class PackageManagerBaseClass(ABC):
 class ToolCliBaseClass(PackageManagerBaseClass):
     """
     Tool class wrapper
-    This is an abstract base class that provides the structure for 
+    This is an abstract base class that provides the structure for
     a tool to implement to behave consistently with the
     rest of the tool wrappers. It also provies some helper functions
     """

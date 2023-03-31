@@ -1,6 +1,7 @@
 #ignore installed folders
 tg/
 sd/
+venv/
 
 #ignore user config
 ./config/*-user.yml

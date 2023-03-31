@@ -1,6 +1,5 @@
-# CLI tool for oogabooga's text-generation-webui for people running on ubuntu 22.04
+# # CLI tool for automatic111's stable-diffusion-webui for people running on ubuntu 22.04
 # available commands are install, configure, start, startd, stop, stopd, update, and remove
-# todo add support for update, and configure
 
 # import modules
 import argparse
@@ -12,21 +11,21 @@ import logging
 from baseclass import ToolCliBaseClass
 
 from scripts.utils import git_pull
-from scripts.tg_scripts import tg_install
-from scripts.tg_scripts import tg_configure
-# from scripts import tg_update
+from scripts.sd_scripts import sd_install
+from scripts.sd_scripts import sd_configure
+# from scripts import sd_update
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 
-class Tg(ToolCliBaseClass):
+class Sd(ToolCliBaseClass):
     def __init__(self):
         logger.debug("Running %s", sys._getframe())
         #call super class constructor with the name of the tool
-        super().__init__("tg")
-        self.EXECBASE = self.TOOLBASE + "text-generation-webui/"
-        self.VENV = self.TOOLBASE + "venv/bin/"
-        self.REPO = "https://github.com/oobabooga/text-generation-webui"
+        super().__init__("sd")
+        self.EXECBASE = self.TOOLBASE + "/stable-diffusion-webui/"
+        self.VENV = self.EXECBASE + "/venv/bin/"
+        self.REPO = "https://github.com/AUTOMATIC1111/stable-diffusion-webui"
 
     def _pull(self):
         logger.debug("Running %s", sys._getframe())
@@ -42,7 +41,8 @@ class Tg(ToolCliBaseClass):
 
     def _install(self):
         logger.debug("Running %s", sys._getframe())
-        installer = tg_install.TGInstaller(self.VENV, self.EXECBASE, self.TOOLBASE)
+        logger.debug("Installing %s in %s", self.NAME, self.EXECBASE)
+        installer = sd_install.SDInstaller(self.VENV, self.EXECBASE, self.TOOLBASE)
         installer.install()
         super()._install()
 
@@ -52,40 +52,10 @@ class Tg(ToolCliBaseClass):
 
     def _configure(self):
         logger.debug("Running %s", sys._getframe())
+        configurer = sd_configure.SDConfigurator(self.CONFIGFOLDER + self.CONFIGFILE, \
+                                                 self.CONFIGFOLDER + self.DEFAULTCONFIGFILE, self.EXECBASE, self.VENV)
+        configurer.configure()
         super()._configure()
-        configurator = tg_configure.TGConfigurator(self.CONFIGFOLDER + self.CONFIGFILE, \
-                                                   self.CONFIGFOLDER +  self.DEFAULTCONFIGFILE, \
-                                                    self.EXECBASE, self.VENV)
-        configurator.configure()
-
-    def _update(self):
-        super()._update()
-
-    def _start(self):
-        logger.debug("Running %s", sys._getframe())
-        super()._start()
-        #starts the server and passes in all remaining arguments
-        #exec server.py from the EXECBASE folder using the python3 binary from the VENV folder and pass it all remaining arguments
-        os.chdir(self.EXECBASE)
-        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/server.py"] + sys.argv[2:])
-        spoc.wait()
-
-    def _startd(self):
-        logger.debug("Running %s", sys._getframe())
-        #starts the daemon and passes in all remaining arguments
-        #exec server.py from the EXECBASE folder using the python3 binary from the VENV folder and pass it all remaining arguments
-        os.chdir(self.EXECBASE)
-        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/server.py"] + sys.argv[2:])
-
-    def _stop(self):
-        logger.debug("Running %s", sys._getframe())
-        super()._stop()
-        #kills the daemon that was started by _startd
-        #get the pid of the server.py python process
-        pid = subprocess.check_output(["pgrep", "-f", self.EXECBASE + "/server.py"]).decode("utf-8")
-        #kill the process
-        subprocess.run(["kill", pid])
-
 
     def _remove(self):
         logger.debug("Running %s", sys._getframe())
@@ -102,6 +72,30 @@ class Tg(ToolCliBaseClass):
             #delete the toolbase folder
             shutil.rmtree(self.TOOLBASE)
 
+    def _start(self):
+        logger.debug("Running %s", sys._getframe())
+        super()._start()
+        os.chdir(self.EXECBASE)
+        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/launch.py"] + sys.argv[2:])
+        spoc.wait()
+
+    def _startd(self):
+        logger.debug("Running %s", sys._getframe())
+        os.chdir(self.EXECBASE)
+        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/launch.py"] + sys.argv[2:])
+
+
+    def _stop(self):
+        logger.debug("Running %s", sys._getframe())
+        super()._stop()
+        #kill the stable-diffusion-webui process
+        pid = subprocess.check_output(["ps aux | grep stable-diffusion-webui | grep -v grep | awk '{print $2}'"], shell=True).strip()
+        if pid:
+            subprocess.call(["kill", "-9", pid])
+
+    def _update(self):
+        logger.debug("Running %s", sys._getframe())
+        super()._update()
 
     def install(self):
         logger.debug("Running %s", sys._getframe())
@@ -110,7 +104,6 @@ class Tg(ToolCliBaseClass):
         self._install()
         self._postinstall()
         self._configure()
-
     def configure(self):
         logger.debug("Running %s", sys._getframe())
         self._configure()
@@ -118,10 +111,6 @@ class Tg(ToolCliBaseClass):
     def start(self):
         logger.debug("Running %s", sys._getframe())
         self._start()
-
-    def startd(self):
-        logger.debug("Running %s", sys._getframe())
-        self._startd()
 
     def stop(self):
         logger.debug("Running %s", sys._getframe())
@@ -131,11 +120,15 @@ class Tg(ToolCliBaseClass):
         logger.debug("Running %s", sys._getframe())
         self._update()
 
+    def startd(self):
+        logger.debug("Running %s", sys._getframe())
+        self._startd()
+
     def remove(self):
         logger.debug("Running %s", sys._getframe())
         self._remove()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logger.debug("Running %s", sys._getframe())
 
     # parse arguments
@@ -144,25 +137,25 @@ if __name__ == '__main__':
     commandgroup.add_argument("-i", "--install", action="store_true", help="install the tool")
     commandgroup.add_argument("-c", "--configure", action="store_true", help="configure the tool")
     commandgroup.add_argument("-s", "--start", action="store_true", help="start the tool")
-    commandgroup.add_argument("-d", "--startd", action="store_true", help="start the tool as a background process")
-    commandgroup.add_argument("-p", "--stopd", action="store_true", help="stop the tool background process")
+    commandgroup.add_argument("-d", "--startd", action="store_true", help="start the tool in daemon mode")
+    commandgroup.add_argument("-p", "--stopd", action="store_true", help="stop the tool in daemon mode")
     #commandgroup.add_argument("-u", "--update", action="store_true", help="update the tool")
     commandgroup.add_argument("-r", "--remove", action="store_true", help="remove the tool")
     args = parser.parse_args()
 
-    # run command
-    tg = Tg()
+    # run the tool
+    sd = Sd()
     if args.install:
-        tg.install()
+        sd.install()
     elif args.configure:
-       tg.configure()
+        sd.configure()
     elif args.start:
-        tg.start()
+        sd.start()
     elif args.startd:
-        tg.startd()
+        sd.startd()
     elif args.stopd:
-        tg.stop()
-    #elif args.update:
-    #    tg.update()
+        sd.stop()
+    # elif args.update:
+    #     sd.update()
     elif args.remove:
-        tg.remove()
+        sd.remove()
