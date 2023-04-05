@@ -1,6 +1,7 @@
-# CLI tool for oogabooga's text-generation-webui for people running on ubuntu 22.04
-# available commands are install, configure, start, startd, stop, stopd, update, and remove
-# todo add support for update, and configure
+"""
+A CLI tool for installing, configuring, and running text-generation-webui
+available commands are install, configure, start, stop, run, configure, update, install, and remove
+"""
 
 # import modules
 import argparse
@@ -14,10 +15,9 @@ from baseclass import ToolCliBaseClass
 from scripts.utils import git_pull
 from scripts.tg_scripts import tg_install
 from scripts.tg_scripts import tg_configure
-# from scripts import tg_update
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Tg(ToolCliBaseClass):
     def __init__(self):
@@ -61,31 +61,30 @@ class Tg(ToolCliBaseClass):
     def _update(self):
         super()._update()
 
-    def _start(self):
+    def _run(self, extra_args):
         logger.debug("Running %s", sys._getframe())
-        super()._start()
+        super()._run()
         #starts the server and passes in all remaining arguments
         #exec server.py from the EXECBASE folder using the python3 binary from the VENV folder and pass it all remaining arguments
         os.chdir(self.EXECBASE)
-        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/server.py"] + sys.argv[2:])
+        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/server.py"] + extra_args)
         spoc.wait()
 
-    def _startd(self):
+    def _start(self, extra_args):
         logger.debug("Running %s", sys._getframe())
         #starts the daemon and passes in all remaining arguments
         #exec server.py from the EXECBASE folder using the python3 binary from the VENV folder and pass it all remaining arguments
         os.chdir(self.EXECBASE)
-        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/server.py"] + sys.argv[2:])
+        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/server.py"] + extra_args)
 
     def _stop(self):
         logger.debug("Running %s", sys._getframe())
         super()._stop()
-        #kills the daemon that was started by _startd
+        #kills the daemon that was started by _start
         #get the pid of the server.py python process
         pid = subprocess.check_output(["pgrep", "-f", self.EXECBASE + "/server.py"]).decode("utf-8")
         #kill the process
         subprocess.run(["kill", pid])
-
 
     def _remove(self):
         logger.debug("Running %s", sys._getframe())
@@ -102,7 +101,6 @@ class Tg(ToolCliBaseClass):
             #delete the toolbase folder
             shutil.rmtree(self.TOOLBASE)
 
-
     def install(self):
         logger.debug("Running %s", sys._getframe())
         self._pull()
@@ -115,13 +113,13 @@ class Tg(ToolCliBaseClass):
         logger.debug("Running %s", sys._getframe())
         self._configure()
 
-    def start(self):
+    def run(self, extra_args):
         logger.debug("Running %s", sys._getframe())
-        self._start()
+        self._run(extra_args=extra_args)
 
-    def startd(self):
+    def start(self, extra_args):
         logger.debug("Running %s", sys._getframe())
-        self._startd()
+        self._start(extra_args=extra_args)
 
     def stop(self):
         logger.debug("Running %s", sys._getframe())
@@ -140,29 +138,27 @@ if __name__ == '__main__':
 
     # parse arguments
     parser = argparse.ArgumentParser()
-    commandgroup = parser.add_mutually_exclusive_group(required=True)
-    commandgroup.add_argument("-i", "--install", action="store_true", help="install the tool")
-    commandgroup.add_argument("-c", "--configure", action="store_true", help="configure the tool")
-    commandgroup.add_argument("-s", "--start", action="store_true", help="start the tool")
-    commandgroup.add_argument("-d", "--startd", action="store_true", help="start the tool as a background process")
-    commandgroup.add_argument("-p", "--stopd", action="store_true", help="stop the tool background process")
-    #commandgroup.add_argument("-u", "--update", action="store_true", help="update the tool")
-    commandgroup.add_argument("-r", "--remove", action="store_true", help="remove the tool")
+    parser.add_argument('command', choices=['start', 'stop', \
+                                            'run', \
+                                            'install', 'remove', \
+                                            'update', 'configure'])
+    parser.add_argument('extra_args', nargs=argparse.REMAINDER, default=[])
+
     args = parser.parse_args()
 
     # run command
     tg = Tg()
-    if args.install:
-        tg.install()
-    elif args.configure:
-       tg.configure()
-    elif args.start:
-        tg.start()
-    elif args.startd:
-        tg.startd()
-    elif args.stopd:
+    if args.command == "start":
+        tg.start(extra_args=args.extra_args)
+    elif args.command == "stop":
         tg.stop()
-    #elif args.update:
-    #    tg.update()
-    elif args.remove:
+    elif args.command == "run":
+        tg.run(extra_args=args.extra_args)
+    elif args.command == "install":
+        tg.install()
+    elif args.command == "remove":
         tg.remove()
+    elif args.command == "update":
+        tg.update()
+    elif args.command == "configure":
+        tg.configure()

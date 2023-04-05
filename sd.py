@@ -1,5 +1,7 @@
-# # CLI tool for automatic111's stable-diffusion-webui for people running on ubuntu 22.04
-# available commands are install, configure, start, startd, stop, stopd, update, and remove
+"""
+A CLI tool for installing, configuring, and running stable-diffusion-webui
+available commands are install, configure, start, stop, run, configure, update, install, and remove
+"""
 
 # import modules
 import argparse
@@ -13,10 +15,9 @@ from baseclass import ToolCliBaseClass
 from scripts.utils import git_pull
 from scripts.sd_scripts import sd_install
 from scripts.sd_scripts import sd_configure
-# from scripts import sd_update
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger()
+logging.basicConfig(level=logging.info)
+logger = logging.getLogger(__name__)
 
 class Sd(ToolCliBaseClass):
     def __init__(self):
@@ -72,17 +73,17 @@ class Sd(ToolCliBaseClass):
             #delete the toolbase folder
             shutil.rmtree(self.TOOLBASE)
 
-    def _start(self):
+    def _run(self, extra_args):
         logger.debug("Running %s", sys._getframe())
         super()._start()
         os.chdir(self.EXECBASE)
-        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/launch.py"] + sys.argv[2:])
+        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/launch.py"] + extra_args)
         spoc.wait()
 
-    def _startd(self):
+    def _start(self, extra_args):
         logger.debug("Running %s", sys._getframe())
         os.chdir(self.EXECBASE)
-        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/launch.py"] + sys.argv[2:])
+        spoc = subprocess.Popen([self.VENV + "/python3", self.EXECBASE + "/launch.py"] + extra_args)
 
 
     def _stop(self):
@@ -108,21 +109,21 @@ class Sd(ToolCliBaseClass):
         logger.debug("Running %s", sys._getframe())
         self._configure()
 
-    def start(self):
+    def start(self, extra_args):
         logger.debug("Running %s", sys._getframe())
-        self._start()
+        self._start(extra_args=extra_args)
 
     def stop(self):
         logger.debug("Running %s", sys._getframe())
         self._stop()
 
+    def run(self, extra_args):
+        logger.debug("Running %s", sys._getframe())
+        self._run(extra_args=extra_args)
+
     def update(self):
         logger.debug("Running %s", sys._getframe())
         self._update()
-
-    def startd(self):
-        logger.debug("Running %s", sys._getframe())
-        self._startd()
 
     def remove(self):
         logger.debug("Running %s", sys._getframe())
@@ -133,29 +134,26 @@ if __name__ == "__main__":
 
     # parse arguments
     parser = argparse.ArgumentParser()
-    commandgroup = parser.add_mutually_exclusive_group(required=True)
-    commandgroup.add_argument("-i", "--install", action="store_true", help="install the tool")
-    commandgroup.add_argument("-c", "--configure", action="store_true", help="configure the tool")
-    commandgroup.add_argument("-s", "--start", action="store_true", help="start the tool")
-    commandgroup.add_argument("-d", "--startd", action="store_true", help="start the tool in daemon mode")
-    commandgroup.add_argument("-p", "--stopd", action="store_true", help="stop the tool in daemon mode")
-    #commandgroup.add_argument("-u", "--update", action="store_true", help="update the tool")
-    commandgroup.add_argument("-r", "--remove", action="store_true", help="remove the tool")
+    parser.add_argument('command', choices=['start', 'stop', \
+                                            'run', \
+                                            'install', 'remove', \
+                                            'update', 'configure'])
+    parser.add_argument('extra_args', nargs=argparse.REMAINDER, default=[])
+
     args = parser.parse_args()
 
-    # run the tool
     sd = Sd()
-    if args.install:
-        sd.install()
-    elif args.configure:
-        sd.configure()
-    elif args.start:
-        sd.start()
-    elif args.startd:
-        sd.startd()
-    elif args.stopd:
+    if args.command == "start":
+        sd.start(extra_args=args.extra_args)
+    elif args.command == "stop":
         sd.stop()
-    # elif args.update:
-    #     sd.update()
-    elif args.remove:
+    elif args.command == "run":
+        sd.run(extra_args=args.extra_args)
+    elif args.command == "install":
+        sd.install()
+    elif args.command == "remove":
         sd.remove()
+    elif args.command == "update":
+        sd.update()
+    elif args.command == "configure":
+        sd.configure()
