@@ -7,6 +7,10 @@
 import os
 import signal
 import subprocess
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class SDInstaller:
     def __init__(self, SDENV, SDEXECPATH, SDBASE):
@@ -56,13 +60,13 @@ class SDInstaller:
         #run the EXECCMD
         os.chdir(self.SDEXECPATH)
         sproc = subprocess.Popen(". "+self.SDENV +"/activate && ./webui.sh", stdout=subprocess.PIPE, shell=True)
-        #wait for the process to output line starting with "Runing on local url" then stop it
+        #wait for the process to output line starting with "Running on local url" then stop it
         while True:
             for line in iter(sproc.stdout.readline, b''):
                 if line != '':
-                    print(line)
+                    logger.info(line)
                     if line.startswith(b"Running on local URL"):
-                        print("Stable Diffusion installed. Stopping webui")
+                        logger.info("Stable Diffusion installed. Stopping webui")
                         # send SIGTERM to the whole process group
                         os.killpg(os.getpgid(sproc.pid), signal.SIGTERM)
                         break
@@ -80,11 +84,11 @@ class SDInstaller:
     #         for line in iter(sproc.stdout.readline, b''):
     #             if line != '':
     #                 if line.startswith(b"Running on local URL"):
-    #                     print("Stable Diffusion installed. Stopping webui")
+    #                     logger.info("Stable Diffusion installed. Stopping webui")
     #                     sproc.kill()
     #                     break
     #                 else:
-    #                     print(line)
+    #                     logger.info(line)
     #             else:
     #                 break
 

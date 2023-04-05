@@ -2,4 +2,4 @@
 #format is usecase -> site -> account/modelname
 models:
   huggingface:
-    PygmalionAI/pygmalion-350m
+    PygmalionAI/pygmalion-6b

@@ -1,10 +1,13 @@
 # install AMD ROCm on Ubuntu 22.04
 # todo add support for removal, update, and configure
-# todo check for exising installation
+# todo check for existing installation
 
 import argparse
 import subprocess
 from baseclass import PackageManagerBaseClass
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Rocm(PackageManagerBaseClass):
     def __init__(self):
@@ -31,27 +34,30 @@ class Rocm(PackageManagerBaseClass):
 
     def _remove(self):
         return super()._remove()
-    
+
     def install(self):
         self._install()
 
     def remove(self):
         self._remove()
-    
+
     def update(self):
         self._update()
-    
+
     def configure(self):
         self._configure()
-    
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    commandgroup = parser.add_mutually_exclusive_group(required=True)
-    commandgroup.add_argument('--install', action='store_true', help='install rocm')
+    # parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command', choices=['install', 'remove', \
+                                            'update', 'configure'])
+    parser.add_argument('extra_args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
     # run command
     rocm = Rocm()
-    if args.install:
+    if args.command == "install":
         rocm.install()

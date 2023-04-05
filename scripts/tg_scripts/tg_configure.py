@@ -3,6 +3,10 @@ import os
 import sys
 import subprocess
 from ..utils.confighelpers import read_config
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class TGConfigurator:
     def __init__(self, configfilepath, defaultconfigfilepath, tgexec, tgenv):
@@ -21,10 +25,10 @@ class TGConfigurator:
         self.TGEXEC = tgexec
         self.TGENV = tgenv
 
-        print("CONFIGFILEPATH: " + self.CONFIGFILEPATH)
-        print("DEFAULTCONFIGFILEPATH: " + self.DEFAULTCONFIGFILEPATH)
-        print("TGEXEC: " + self.TGEXEC)
-        print("TGENV: " + self.TGENV)
+        logger.debug("CONFIGFILEPATH: " + self.CONFIGFILEPATH)
+        logger.debug("DEFAULTCONFIGFILEPATH: " + self.DEFAULTCONFIGFILEPATH)
+        logger.debug("TGEXEC: " + self.TGEXEC)
+        logger.debug("TGENV: " + self.TGENV)
 
     def configure(self):
         #if config contains values under models -> huggingface -> modelname download those
@@ -36,14 +40,14 @@ class TGConfigurator:
                 if isinstance(config['models']['huggingface'], str):
                     config['models']['huggingface'] = [config['models']['huggingface']]
                 for modelname in config['models']['huggingface']:
-                    print("Downloading model %s" % modelname)
+                    logger.info("Downloading model %s" % modelname)
                     #using subprocess to run the command from the virtual environment
                     sproc =subprocess.Popen([self.TGENV+'python', 'download-model.py', modelname])
                     sproc.wait()
 
 
         else:
-            print("No models specified in config file")
+            logger.info("No models specified in config file")
 
 if __name__ == "__main__":
     tgconfigurator = TGConfigurator()

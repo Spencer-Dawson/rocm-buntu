@@ -5,6 +5,10 @@
 import os
 import subprocess
 import shutil
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class TGInstaller:
     def __init__(self, TGENV, TGEXEC, TGPATH):
@@ -22,9 +26,9 @@ class TGInstaller:
         self.TGEXEC = TGEXEC
         self.TGPATH = TGPATH
 
-        print("TGPATH: " + self.TGPATH)
-        print("TGEXEC: " + self.TGEXEC)
-        print("TGENV: " + self.TGENV)
+        logger.debug("TGPATH: " + self.TGPATH)
+        logger.debug("TGEXEC: " + self.TGEXEC)
+        logger.debug("TGENV: " + self.TGENV)
 
     def install(self):
         #create virtual environment

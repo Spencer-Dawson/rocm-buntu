@@ -11,25 +11,27 @@ import subprocess
 from abc import ABC, abstractmethod
 import logging
 
-#logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class PackageManagerBaseClass(ABC):
     """
     Package Manager class wrapper
     This is an abstract base class that provides the structure for
     a package manager to implement to behave consistently with the
-    rest of the package wrappers. It also provies some helper
+    rest of the package wrappers. It also provides some helper
     functions
     """
 
     @abstractmethod
     def __init__(self, name):
+        """
+        Constructor
+        Sets global constants for the convenience of derived classes and checks for OS compatibility
+        some of these are not used in some derived classes
+        for example ROCm installation doesn't need a toolbase directory
+        """
         logger.debug("Running %s", sys._getframe())
-
-        # sets global constants and checks for OS compatability
-        # some of these are not used in some derived classes
-        # for example ROCm Instalation doesn't need a toolbase directory
 
         # name of the tool
         self.NAME = name
@@ -90,6 +92,11 @@ class PackageManagerBaseClass(ABC):
 
 
     def _check_amd_gpu(self):
+        """
+        Checks if an AMD GPU is present
+        returns true if an AMD GPU is present
+        else returns false
+        """
         logger.debug("Running %s", sys._getframe())
         try:
             lspci = subprocess.check_output('lspci | grep -i vga', shell=True, universal_newlines=True)
@@ -103,6 +110,11 @@ class PackageManagerBaseClass(ABC):
             sys.exit(1)
 
     def _check_rocm(self):
+        """
+        Checks if ROCm is installed
+        returns true if ROCm is installed
+        else returns false
+        """
         logger.debug("Running %s", sys._getframe())
         try:
             rocm = subprocess.check_output('which rocm-smi', shell=True, universal_newlines=True)
@@ -117,41 +129,66 @@ class PackageManagerBaseClass(ABC):
 
     @abstractmethod
     def _pull(self):
+        """
+        Abstract method to enforce derived classes implement pulling code to install in this way
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _preinstall(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that runs between pull and install
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _install(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that installs the utility
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _postinstall(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that runs between install and configure
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _configure(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that configures the utility
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _update(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that updates the utility
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _remove(self):
+        """
+        Abstract method to enforce derived classes implement a method to remove the utility
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def install(self):
+        """
+        Abstract method to enforce derived classes implement an interface to install the utility
+        This method is not intended to be called, but an example for the derived class
+        """
         logger.debug("Running %s", sys._getframe())
         self._pull()
         self._preinstall()
@@ -161,16 +198,25 @@ class PackageManagerBaseClass(ABC):
 
     @abstractmethod
     def configure(self):
+        """
+        Abstract method to enforce derived classes implement an interface to configure the utility
+        """
         logger.debug("Running %s", sys._getframe())
         self._configure()
 
     @abstractmethod
     def update(self):
+        """
+        Abstract method to enforce derived classes implement an interface to update the utility
+        """
         logger.debug("Running %s", sys._getframe())
         self._update()
 
     @abstractmethod
     def remove(self):
+        """
+        Abstract method to enforce derived classes implement an interface to remove the utility
+        """
         logger.debug("Running %s", sys._getframe())
         self._remove()
 
@@ -179,61 +225,106 @@ class ToolCliBaseClass(PackageManagerBaseClass):
     Tool class wrapper
     This is an abstract base class that provides the structure for
     a tool to implement to behave consistently with the
-    rest of the tool wrappers. It also provies some helper functions
+    rest of the tool wrappers. It also provides some helper functions
     """
 
     @abstractmethod
     def __init__(self, name):
+        """
+        Constructor
+        Sets global constants for the convenience of derived classes and checks for OS compatibility
+        some of these are not used in some derived classes
+        for example ROCm installation doesn't need a toolbase directory
+        """
         logger.debug("Running %s", sys._getframe())
         super().__init__(name)
 
     @abstractmethod
     def _pull(self):
+        """
+        Abstract method to enforce derived classes implement pulling code to install in this way
+        """
         logger.debug("Running %s", sys._getframe())
         super()._pull()
 
     @abstractmethod
     def _preinstall(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that runs between pull and install
+        """
         logger.debug("Running %s", sys._getframe())
         super()._preinstall()
 
     @abstractmethod
     def _install(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that installs the utility
+        """
         logger.debug("Running %s", sys._getframe())
         super()._install()
 
     @abstractmethod
     def _postinstall(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that runs between install and configure
+        """
         logger.debug("Running %s", sys._getframe())
         super()._postinstall()
 
     @abstractmethod
     def _configure(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that configures the utility
+        """
         logger.debug("Running %s", sys._getframe())
         super()._configure()
 
     @abstractmethod
     def _update(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that updates the utility
+        """
         logger.debug("Running %s", sys._getframe())
         super()._update()
 
     @abstractmethod
     def _start(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that starts the utility as a daemon
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _stop(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that stops the utility as a daemon
+        """
+        logger.debug("Running %s", sys._getframe())
+        pass
+
+    @abstractmethod
+    def _run(self):
+        """
+        Abstract method to enforce derived classes implement a place to put code that runs the utility as a subprocess
+        """
         logger.debug("Running %s", sys._getframe())
         pass
 
     @abstractmethod
     def _remove(self):
+        """
+        Abstract method to enforce derived classes implement a method to remove the utility
+        """
         logger.debug("Running %s", sys._getframe())
         super()._remove()
 
     @abstractmethod
     def install(self):
+        """
+        Abstract method to enforce derived classes implement an interface to install the utility
+        This method is not intended to be called, but an example for the derived class
+        """
         logger.debug("Running %s", sys._getframe())
         self._pull()
         self._preinstall()
@@ -243,33 +334,56 @@ class ToolCliBaseClass(PackageManagerBaseClass):
 
     @abstractmethod
     def configure(self):
+        """
+        Abstract method to enforce derived classes implement an interface to configure the utility
+        """
         logger.debug("Running %s", sys._getframe())
         self._configure()
 
     @abstractmethod
     def start(self):
+        """
+        Abstract method to enforce derived classes implement an interface to start the utility as a daemon
+        """
         logger.debug("Running %s", sys._getframe())
         super()._start()
 
     @abstractmethod
     def stop(self):
+        """
+        Abstract method to enforce derived classes implement an interface to stop the utility as a daemon
+        """
         logger.debug("Running %s", sys._getframe())
         self._stop()
 
     @abstractmethod
+    def run(self):
+        """
+        Abstract method to enforce derived classes implement an interface to run the utility as a subprocess
+        """
+        logger.debug("Running %s", sys._getframe())
+        self._run()
+
+    @abstractmethod
     def update(self):
+        """
+        Abstract method to enforce derived classes implement an interface to update the utility
+        """
         logger.debug("Running %s", sys._getframe())
         self._update()
 
     @abstractmethod
     def remove(self):
+        """
+        Abstract method to enforce derived classes implement an interface to remove the utility
+        """
         logger.debug("Running %s", sys._getframe())
         self._remove()
 
 class ToolCliWrapperTestClass(ToolCliBaseClass):
     """
     Tool class wrapper test class
-    This is a unit test function for the ToolCliBaseClass
+    This is a manual unit test function for the ToolCliBaseClass
     """
 
     def __init__(self, name):
@@ -310,6 +424,11 @@ class ToolCliWrapperTestClass(ToolCliBaseClass):
         super()._stop()
         pass
 
+    def _run(self):
+        logger.debug("Running %s", sys._getframe())
+        super()._run()
+        pass
+
     def _remove(self):
         logger.debug("Running %s", sys._getframe())
         super()._remove()
@@ -334,6 +453,10 @@ class ToolCliWrapperTestClass(ToolCliBaseClass):
         logger.debug("Running %s", sys._getframe())
         self._stop()
 
+    def run(self):
+        logger.debug("Running %s", sys._getframe())
+        self._run()
+
     def update(self):
         logger.debug("Running %s", sys._getframe())
         self._update()
@@ -344,7 +467,7 @@ class ToolCliWrapperTestClass(ToolCliBaseClass):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    logger = logging.getLogger()
+    logger = logging.getLogger(__name__)
     logger.warning("Do not run this file directly. Start with rocm-install.py instead")
     logger.debug("what follows is just unit test output")
     testclass = ToolCliWrapperTestClass()
@@ -356,6 +479,8 @@ if __name__ == '__main__':
     testclass.start()
     logger.debug("Running test stop")
     testclass.stop()
+    logger.debug("Running test run")
+    testclass.run()
     logger.debug("Running test update")
     testclass.update()
     logger.debug("Running test remove")
