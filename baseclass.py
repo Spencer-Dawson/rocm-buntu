@@ -73,7 +73,6 @@ class PackageManagerBaseClass(ABC):
         assert self.AMDGPU == True, "This utility only supports AMD GPUs"
         #check if rocm is installed
         self.ROCM = self._check_rocm()
-        assert self.ROCM == True, "ROCm is not installed. Please install ROCm before running this utility"
 
         #print global consts for debugging
         logger.debug("NAME: %s", self.NAME)
@@ -124,8 +123,9 @@ class PackageManagerBaseClass(ABC):
             else:
                 return False
         except subprocess.CalledProcessError as e:
-            logger.error("Error running rocm-smi: %s", e)
-            sys.exit(1)
+            logger.info("Error running rocm-smi: %s", e)
+            logger.info("Assuming rocm not installed")
+            return False
 
     @abstractmethod
     def _pull(self):
@@ -238,6 +238,7 @@ class ToolCliBaseClass(PackageManagerBaseClass):
         """
         logger.debug("Running %s", sys._getframe())
         super().__init__(name)
+        assert self.ROCM == True, "ROCm is not installed. Please install ROCm before running this utility"
 
     @abstractmethod
     def _pull(self):
