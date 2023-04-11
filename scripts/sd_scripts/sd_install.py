@@ -67,8 +67,10 @@ class SDInstaller:
                     logger.info(line)
                     if line.startswith(b"Running on local URL"):
                         logger.info("Stable Diffusion installed. Stopping webui")
-                        # send SIGTERM to the whole process group
-                        os.killpg(os.getpgid(sproc.pid), signal.SIGTERM)
+                        #kill the stable-diffusion-webui process
+                        pid = subprocess.check_output(["ps aux | grep stable-diffusion-webui | grep -v grep | awk '{print $2}'"], shell=True).strip()
+                        if pid:
+                            subprocess.call(["kill", "-9", pid])
                         break
                 else:
                     break

@@ -1,5 +1,0 @@
-#only used to install models from hugging face for now
-#format is usecase -> site -> account/modelname
-models:
-  huggingface:
-    PygmalionAI/pygmalion-6b
