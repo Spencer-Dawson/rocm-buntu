@@ -4,7 +4,7 @@ sd/
 venv/
 
 #ignore user config
-./config/*-user.yml
+config/*-user.yml
 
 #ignore python cache
 *__pycache__*
