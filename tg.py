@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 A CLI tool for installing, configuring, and running text-generation-webui
 available commands are install, configure, start, stop, run, configure, update, install, and remove
