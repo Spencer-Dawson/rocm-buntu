@@ -36,15 +36,12 @@ class TGInstaller:
             shutil.rmtree(self.TGENV)
         os.chdir(self.TGPATH)
         subprocess.run(["python3", "-m", "venv", "venv"])
-        #install requirements
         os.chdir(self.TGEXEC)
-        sproc = subprocess.Popen([self.TGENV+'/pip', "install", "-r", "requirements.txt"])
-        sproc.wait()
-        #uninstall pytorch, torchvision, torchaudio so we can install ROCm version
-        sproc = subprocess.Popen([self.TGENV+'/pip', "uninstall", "torch", "torchvision", "torchaudio", "-y"])
-        sproc.wait()
         #install pytorch ROCm
-        sproc = subprocess.Popen([self.TGENV+'/pip', "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/rocm5.2"])
+        sproc = subprocess.Popen([self.TGENV+'/pip', "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/rocm5.6"])
+        sproc.wait()
+        #install requirements
+        sproc = subprocess.Popen([self.TGENV+'/pip', "install", "-r", "requirements_amd.txt"])
         sproc.wait()
 
 if __name__ == "__main__":
