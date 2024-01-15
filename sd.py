@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 A CLI tool for installing, configuring, and running stable-diffusion-webui
 available commands are install, configure, start, stop, run, configure, update, install, and remove
@@ -90,7 +91,7 @@ class Sd(ToolCliBaseClass):
         logger.debug("Running %s", sys._getframe())
         super()._stop()
         #kill the stable-diffusion-webui process
-        pid = subprocess.check_output(["ps aux | grep stable-diffusion-webui | grep -v grep | awk '{print $2}'"], shell=True).strip()
+        pid = subprocess.check_output(["ps aux | grep launch.py | grep -v grep | awk '{print $2}'"], shell=True).strip()
         if pid:
             subprocess.call(["kill", "-9", pid])
 
