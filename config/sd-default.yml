@@ -3,20 +3,23 @@
 embeddings:
   #Place Textual Inversion embeddings here
   civitai:
-    #models/9857 #CharTurner
-    https://civitai.com/api/download/models/9857
+    # CharTurner https://civitai.com/models/3036?modelVersionId=3334 charturner
+    https://civitai.com/api/download/models/3334
 models:
   hypernetworks:
     #Place hypernetworks here
     civitai:
-      https://civitai.com/api/download/models/5255 # [Toru8P] Waven Chibi Style
+      # [Toru8P] Waven Chibi Style https://civitai.com/models/4379/toru8p-waven-chibi-style 
+      https://civitai.com/api/download/models/5255
   Stable-diffusion:
     #Put Stable Diffusion checkpoints here
     civitai:
-      https://civitai.com/api/download/models/15236 # Deliberate
+      # Deliberate https://civitai.com/models/4823/deliberate 
+      https://civitai.com/api/download/models/15236
   Lora:
     civitai:
-      https://civitai.com/api/download/models/7657 # Studio Ghibli Style
+      # Studio Ghibli Style https://civitai.com/models/6526/studio-ghibli-style-lora ghibli style
+      https://civitai.com/api/download/models/7657
 
 #todo: support every plugin type on civitai
 #todo: support ControlNet installation

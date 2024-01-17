@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # install AMD ROCm on Ubuntu 22.04
 # todo add support for removal, update, and configure
 # todo check for existing installation
