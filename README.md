@@ -26,3 +26,13 @@ Coming Soon:
 - Will integrate other tools based on feedback
 
 Support for other environments(Besides Ubuntu 22.04 with AMD ROCm compatible GPUs) is not currently being pursued, but may considered in the future
+
+Instalation:
+- install git, python3 virtualenv, and python3-setuptools, python3-dev, libstdc++-12-dev '''sudo apt install git python3-venv python3-setuptools python3-dev libstdc++-12-dev'''
+- From your own folder(or any other directory you want to download under that doesn't have a space in the folder path)
+    - '''git clone https://github.com/Spencer-Dawson/rocm-buntu.git'''
+    - '''cd rocm-buntu'''
+    - To install rocm run '''./rocm.py install''' I strongly recommend using the latest version of rocm
+    - Reboot your system
+    - To install text-generation-webui run '''./tg.py install'''
+    - To install stable-diffusion-webui run '''./sd.py install'''
